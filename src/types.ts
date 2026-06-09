@@ -12,6 +12,11 @@ export interface AppState {
   isPlaying: boolean;
   maxTime: number;
 
+  interpolate: boolean;
+  loopMode: boolean;
+  pingPong: boolean;
+  repetitions: number;
+
   toggleLed: (index: number) => void;
   setVisiblePlane: (planeIndex: number, visible: boolean) => void;
   toggleVisiblePlane: (planeIndex: number) => void;
@@ -22,4 +27,11 @@ export interface AppState {
   setIsPlaying: (playing: boolean) => void;
   importProject: (frames: LEDFrame[]) => void;
   clearProject: () => void;
+
+  setInterpolate: (val: boolean) => void;
+  setMaxTime: (val: number) => void;
+  setLoopMode: (val: boolean) => void;
+  setPingPong: (val: boolean) => void;
+  setRepetitions: (val: number) => void;
 }
+

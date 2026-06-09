@@ -7,12 +7,13 @@ import React, { useState } from 'react';
 import { Cube3D } from './components/Cube3D';
 import { Timeline } from './components/Timeline';
 import { CodeExport } from './components/CodeExport';
+import { AIGenerator } from './components/AIGenerator';
 import { useAppStore } from './store';
-import { Download, Upload, Trash, Info } from 'lucide-react';
+import { Download, Upload, Trash, Info, Sparkles } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'editor' | 'code'>('editor');
-  const { frames, importProject, clearProject } = useAppStore();
+  const [activeTab, setActiveTab] = useState<'editor' | 'code' | 'ai'>('editor');
+  const { frames, importProject, clearProject, visiblePlanes, toggleVisiblePlane } = useAppStore();
 
   const handleSaveProject = () => {
     const data = JSON.stringify(frames, null, 2);
@@ -70,6 +71,15 @@ export default function App() {
           >
             Code Export
           </button>
+          <button
+            className={`px-4 py-1.5 rounded text-sm font-medium transition-colors flex items-center gap-1 ${
+              activeTab === 'ai' ? 'bg-purple-600/50 text-purple-200' : 'text-neutral-400 hover:text-purple-400'
+            }`}
+            onClick={() => setActiveTab('ai')}
+          >
+            <Sparkles size={14} />
+            AI Generator
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -105,22 +115,43 @@ export default function App() {
           <div className="flex flex-col h-full gap-4">
             <div className="flex-1 relative flex gap-4 min-h-0">
               {/* 3D Viewport */}
-              <div className="flex-1 rounded-lg border border-neutral-800 overflow-hidden relative">
+              <div className="flex-1 rounded-lg border border-neutral-800 overflow-hidden relative flex">
                 <Cube3D />
                 
                 {/* Tips Box Overlay */}
-                <div className="absolute bottom-4 left-4 w-64 bg-black/80 backdrop-blur-md border border-neutral-700 rounded p-4 text-sm text-neutral-300">
+                <div className="absolute bottom-4 left-4 w-64 bg-black/80 backdrop-blur-md border border-neutral-700 rounded p-4 text-sm text-neutral-300 pointer-events-none">
                   <div className="flex items-center gap-2 mb-2 text-white font-medium">
                     <Info size={16} className="text-blue-400" />
                     <span>Controls</span>
                   </div>
                   <ul className="space-y-1 ml-4 list-disc marker:text-neutral-500">
                     <li>Left click + Drag to rotate</li>
-                    <li>Right click + Drag to pan</li>
                     <li>Scroll to zoom</li>
                     <li>Click LEDs to toggle state</li>
                     <li>Press <kbd className="bg-neutral-800 px-1 rounded text-white text-xs">1</kbd> <kbd className="bg-neutral-800 px-1 rounded text-white text-xs">2</kbd> <kbd className="bg-neutral-800 px-1 rounded text-white text-xs">3</kbd> <kbd className="bg-neutral-800 px-1 rounded text-white text-xs">4</kbd> to toggle plane visibility</li>
                   </ul>
+                </div>
+
+                {/* Layer Toggles on the Right */}
+                <div className="absolute top-1/2 -translate-y-1/2 right-4 flex flex-col gap-2">
+                  {[4, 3, 2, 1].map((num) => {
+                    const planeIndex = num - 1;
+                    const isVisible = visiblePlanes[planeIndex];
+                    return (
+                      <button
+                        key={num}
+                        onClick={() => toggleVisiblePlane(planeIndex)}
+                        className={`w-10 h-10 flex items-center justify-center rounded font-bold transition-colors ${
+                          isVisible 
+                            ? 'bg-blue-600 text-white hover:bg-blue-500' 
+                            : 'bg-neutral-800 text-neutral-500 border border-neutral-700 hover:bg-neutral-700 hover:text-neutral-300'
+                        }`}
+                        title={`Toggle Layer ${num} visibility`}
+                      >
+                        {num}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -130,8 +161,10 @@ export default function App() {
               <Timeline />
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'code' ? (
           <CodeExport />
+        ) : (
+          <AIGenerator />
         )}
       </main>
     </div>
