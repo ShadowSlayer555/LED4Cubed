@@ -5,6 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    base: '/LED4Cubed/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
